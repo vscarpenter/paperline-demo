@@ -1,0 +1,634 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1" />
+<title>Fieldnotes — Team documentation, beautifully organized</title>
+
+<link rel="preconnect" href="https://fonts.googleapis.com" />
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+<link href="https://fonts.googleapis.com/css2?family=Instrument+Sans:wght@400;500;600;700&family=Instrument+Serif:ital@0;1&family=JetBrains+Mono:wght@400;500;600&display=swap" rel="stylesheet" />
+<link rel="stylesheet" href="./node_modules/paperline/dist/paperline.css" />
+
+<style>
+  html, body { margin: 0; padding: 0; }
+  body { background: var(--pl-paper-0); font-family: var(--pl-font-sans); }
+
+  /* Nav */
+  .topnav {
+    position: sticky;
+    top: 0;
+    z-index: 50;
+    height: 60px;
+    display: flex;
+    align-items: center;
+    padding: 0 40px;
+    background: var(--pl-paper-card);
+    border-bottom: 1px solid var(--pl-hairline);
+    gap: 32px;
+  }
+  .topnav-brand {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    font-family: var(--pl-font-serif);
+    font-size: 20px;
+    color: var(--pl-ink-1);
+    text-decoration: none;
+  }
+  .topnav-links {
+    display: flex;
+    align-items: center;
+    gap: 4px;
+    flex: 1;
+  }
+  .topnav-link {
+    font-size: 13.5px;
+    font-weight: 500;
+    color: var(--pl-ink-3);
+    text-decoration: none;
+    padding: 5px 12px;
+    border-radius: 6px;
+    transition: background var(--pl-dur-1), color var(--pl-dur-1);
+  }
+  .topnav-link:hover { background: var(--pl-paper-1); color: var(--pl-ink-1); }
+  .topnav-actions { display: flex; align-items: center; gap: 8px; margin-left: auto; }
+
+  /* Hero */
+  .hero {
+    max-width: 900px;
+    margin: 0 auto;
+    padding: 96px 40px 80px;
+    text-align: center;
+  }
+  .hero-eyebrow {
+    display: inline-flex;
+    align-items: center;
+    gap: 6px;
+    background: var(--pl-accent-50);
+    color: var(--pl-accent-700);
+    border: 1px solid var(--pl-accent-100);
+    border-radius: 999px;
+    font-size: 11.5px;
+    font-weight: 600;
+    letter-spacing: 0.06em;
+    padding: 4px 12px;
+    margin-bottom: 28px;
+    font-family: var(--pl-font-sans);
+  }
+  .hero h1 {
+    font-family: var(--pl-font-serif);
+    font-size: clamp(40px, 6vw, 64px);
+    font-weight: 400;
+    letter-spacing: -0.03em;
+    color: var(--pl-ink-1);
+    line-height: 1.1;
+    margin: 0 0 20px;
+  }
+  .hero h1 em { font-style: italic; color: var(--pl-accent-500); }
+  .hero-desc {
+    font-size: 17px;
+    line-height: 1.65;
+    color: var(--pl-ink-3);
+    max-width: 560px;
+    margin: 0 auto 36px;
+  }
+  .hero-actions { display: flex; align-items: center; justify-content: center; gap: 12px; flex-wrap: wrap; }
+  .hero-proof {
+    margin-top: 60px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 12px;
+    color: var(--pl-ink-4);
+    font-size: 12px;
+  }
+  .hero-proof-sep { width: 1px; height: 16px; background: var(--pl-hairline-strong); }
+
+  /* Feature screenshot placeholder */
+  .hero-screenshot {
+    max-width: 860px;
+    margin: 0 auto 100px;
+    padding: 0 40px;
+  }
+  .screenshot-frame {
+    background: var(--pl-paper-card);
+    border: 1px solid var(--pl-hairline-strong);
+    border-radius: 16px;
+    box-shadow: var(--pl-shadow-md);
+    overflow: hidden;
+  }
+  .screenshot-bar {
+    height: 40px;
+    background: var(--pl-paper-1);
+    border-bottom: 1px solid var(--pl-hairline);
+    display: flex;
+    align-items: center;
+    padding: 0 16px;
+    gap: 7px;
+  }
+  .dot { width: 10px; height: 10px; border-radius: 999px; }
+  .screenshot-content {
+    display: grid;
+    grid-template-columns: 200px 1fr;
+    min-height: 340px;
+  }
+  .screenshot-sidebar {
+    background: var(--pl-paper-1);
+    border-right: 1px solid var(--pl-hairline);
+    padding: 16px 12px;
+    display: flex;
+    flex-direction: column;
+    gap: 6px;
+  }
+  .ss-item {
+    height: 28px;
+    background: var(--pl-paper-2);
+    border-radius: 6px;
+    opacity: 0.7;
+  }
+  .ss-item.active { background: var(--pl-accent-100); opacity: 1; }
+  .screenshot-body { padding: 24px 28px; display: flex; flex-direction: column; gap: 14px; }
+  .ss-heading { height: 32px; background: var(--pl-paper-2); border-radius: 6px; width: 55%; }
+  .ss-line { height: 12px; background: var(--pl-paper-2); border-radius: 6px; opacity: 0.6; }
+  .ss-line.short { width: 75%; }
+  .ss-line.xshort { width: 45%; }
+
+  /* Section */
+  .section { padding: 72px 40px; max-width: 1060px; margin: 0 auto; }
+  .section-eyebrow {
+    font-size: 10.5px;
+    font-weight: 700;
+    letter-spacing: 0.16em;
+    text-transform: uppercase;
+    color: var(--pl-accent-500);
+    margin-bottom: 12px;
+    font-family: var(--pl-font-sans);
+  }
+  .section-title {
+    font-family: var(--pl-font-serif);
+    font-size: clamp(28px, 4vw, 42px);
+    font-weight: 400;
+    letter-spacing: -0.025em;
+    color: var(--pl-ink-1);
+    margin: 0 0 16px;
+  }
+  .section-title em { font-style: italic; color: var(--pl-accent-500); }
+  .section-desc { font-size: 15px; color: var(--pl-ink-3); max-width: 520px; line-height: 1.65; margin: 0 0 48px; }
+
+  /* Feature grid */
+  .feature-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 18px; }
+  @media (max-width: 720px) { .feature-grid { grid-template-columns: 1fr; } }
+  .feature-icon {
+    width: 40px;
+    height: 40px;
+    border-radius: 10px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    margin-bottom: 14px;
+  }
+  .feature-title { font-size: 15px; font-weight: 600; color: var(--pl-ink-1); margin: 0 0 6px; }
+  .feature-desc { font-size: 13px; color: var(--pl-ink-3); line-height: 1.6; margin: 0; }
+
+  /* Testimonials */
+  .testimonials-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 18px; }
+  @media (max-width: 720px) { .testimonials-grid { grid-template-columns: 1fr; } }
+  .testimonial-quote {
+    font-family: var(--pl-font-serif);
+    font-style: italic;
+    font-size: 16px;
+    color: var(--pl-ink-2);
+    line-height: 1.6;
+    margin: 0 0 20px;
+  }
+  .testimonial-author { display: flex; align-items: center; gap: 10px; }
+  .testimonial-name { font-size: 13px; font-weight: 600; color: var(--pl-ink-1); }
+  .testimonial-role { font-size: 11.5px; color: var(--pl-ink-4); }
+
+  /* Pricing */
+  .pricing-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 18px; align-items: start; }
+  @media (max-width: 720px) { .pricing-grid { grid-template-columns: 1fr; } }
+  .plan-badge {
+    display: inline-block;
+    font-size: 10px;
+    font-weight: 700;
+    letter-spacing: 0.1em;
+    text-transform: uppercase;
+    background: var(--pl-accent-100);
+    color: var(--pl-accent-700);
+    border-radius: 999px;
+    padding: 3px 10px;
+    margin-bottom: 12px;
+    font-family: var(--pl-font-sans);
+  }
+  .plan-name { font-size: 18px; font-weight: 700; color: var(--pl-ink-1); margin: 0 0 4px; }
+  .plan-price {
+    font-family: var(--pl-font-mono);
+    font-size: 36px;
+    font-weight: 700;
+    color: var(--pl-ink-1);
+    margin: 16px 0 4px;
+    display: flex;
+    align-items: flex-start;
+    gap: 2px;
+  }
+  .plan-price sup { font-size: 18px; margin-top: 7px; }
+  .plan-price-period { font-family: var(--pl-font-sans); font-size: 13px; color: var(--pl-ink-3); font-weight: 400; align-self: flex-end; margin-bottom: 4px; }
+  .plan-desc { font-size: 13px; color: var(--pl-ink-3); line-height: 1.55; margin: 0 0 20px; }
+  .plan-features { list-style: none; padding: 0; margin: 20px 0; display: flex; flex-direction: column; gap: 8px; }
+  .plan-feature { display: flex; align-items: center; gap: 9px; font-size: 13px; color: var(--pl-ink-2); }
+  .check { color: var(--pl-ok-500); flex-shrink: 0; }
+  .plan-card-featured {
+    border: 2px solid var(--pl-accent-400) !important;
+    box-shadow: 0 0 0 4px var(--pl-accent-50), var(--pl-shadow-md) !important;
+  }
+
+  /* CTA banner */
+  .cta-banner {
+    background: var(--pl-accent-700);
+    border-radius: 20px;
+    padding: 56px 48px;
+    text-align: center;
+    margin: 0 40px 80px;
+    max-width: 980px;
+    margin-left: auto;
+    margin-right: auto;
+  }
+  .cta-banner h2 {
+    font-family: var(--pl-font-serif);
+    font-size: 38px;
+    font-weight: 400;
+    letter-spacing: -0.025em;
+    color: #fff;
+    margin: 0 0 12px;
+  }
+  .cta-banner h2 em { font-style: italic; opacity: 0.85; }
+  .cta-banner p { font-size: 15px; color: rgba(255,255,255,0.75); margin: 0 auto 28px; max-width: 440px; line-height: 1.6; }
+  .cta-banner-actions { display: flex; justify-content: center; gap: 12px; flex-wrap: wrap; }
+
+  /* Footer */
+  .footer {
+    border-top: 1px solid var(--pl-hairline);
+    padding: 32px 40px;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    flex-wrap: wrap;
+    gap: 16px;
+    max-width: 1060px;
+    margin: 0 auto;
+  }
+  .footer-brand { display: flex; align-items: center; gap: 8px; font-family: var(--pl-font-serif); font-size: 16px; color: var(--pl-ink-1); }
+  .footer-links { display: flex; gap: 20px; }
+  .footer-link { font-size: 12.5px; color: var(--pl-ink-4); text-decoration: none; }
+  .footer-link:hover { color: var(--pl-ink-2); }
+  .footer-copy { font-size: 12px; color: var(--pl-ink-5); }
+
+  /* Divider */
+  .section-divider { border: none; border-top: 1px solid var(--pl-hairline); margin: 0 40px; }
+</style>
+
+<script src="https://unpkg.com/react@18.3.1/umd/react.development.js"></script>
+<script src="https://unpkg.com/react-dom@18.3.1/umd/react-dom.development.js"></script>
+<script src="https://unpkg.com/@babel/standalone@7.29.0/babel.min.js"></script>
+</head>
+<body class="pl-root">
+<div id="root"></div>
+
+<script type="text/babel" src="./node_modules/paperline/dist/paperline-icons.global.jsx"></script>
+<script type="text/babel" src="./node_modules/paperline/dist/paperline-components.global.jsx"></script>
+
+<script type="text/babel">
+const { useState } = React;
+
+const CheckIcon = () => (
+  <svg width="14" height="14" viewBox="0 0 16 16" fill="none" className="check">
+    <path d="M3 8l3.5 3.5L13 5" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"/>
+  </svg>
+);
+
+const Feature = ({ icon: Icon, iconBg, iconColor, title, desc }) => (
+  <PLCard style={{ padding: "22px" }}>
+    <div className="feature-icon" style={{ background: iconBg }}>
+      <Icon size={20} style={{ color: iconColor }} />
+    </div>
+    <p className="feature-title">{title}</p>
+    <p className="feature-desc">{desc}</p>
+  </PLCard>
+);
+
+const Testimonial = ({ quote, name, role, color, initials }) => (
+  <PLCard style={{ padding: "22px" }}>
+    <p className="testimonial-quote">"{quote}"</p>
+    <div className="testimonial-author">
+      <PLAvatar name={initials} color={color} size={32} />
+      <div>
+        <div className="testimonial-name">{name}</div>
+        <div className="testimonial-role">{role}</div>
+      </div>
+    </div>
+  </PLCard>
+);
+
+const PlanCard = ({ badge, name, price, desc, features, cta, featured }) => (
+  <PLCard className={featured ? "plan-card-featured" : ""} style={{ padding: "24px" }}>
+    {badge && <div className="plan-badge">{badge}</div>}
+    <div className="plan-name">{name}</div>
+    <div style={{ fontSize: 13, color: "var(--pl-ink-3)", lineHeight: 1.5 }}>{desc}</div>
+    <div className="plan-price">
+      <sup>$</sup>{price}
+      <span className="plan-price-period">/ mo</span>
+    </div>
+    <PLButton kind={featured ? "primary" : "secondary"} style={{ width: "100%" }}>{cta}</PLButton>
+    <PLDivider style={{ margin: "18px 0" }} />
+    <ul className="plan-features">
+      {features.map((f, i) => (
+        <li key={i} className="plan-feature">
+          <CheckIcon />
+          {f}
+        </li>
+      ))}
+    </ul>
+  </PLCard>
+);
+
+const App = () => {
+  const [theme, setTheme] = useState("light");
+
+  React.useEffect(() => {
+    document.body.classList.toggle("pl-dark", theme === "dark");
+  }, [theme]);
+
+  return (
+    <>
+      {/* Nav */}
+      <nav className="topnav">
+        <a className="topnav-brand" href="index.html">
+          <I.Logo size={24} />
+          Fieldnotes
+        </a>
+        <div className="topnav-links">
+          <a className="topnav-link" href="#features">Features</a>
+          <a className="topnav-link" href="#testimonials">Customers</a>
+          <a className="topnav-link" href="#pricing">Pricing</a>
+          <a className="topnav-link" href="dashboard.html">Dashboard</a>
+        </div>
+        <div className="topnav-actions">
+          <PLButton kind="ghost" size="sm" onClick={() => setTheme(t => t === "light" ? "dark" : "light")}>
+            {theme === "light" ? <I.Moon size={14} /> : <I.Sun size={14} />}
+          </PLButton>
+          <PLButton kind="secondary" size="sm" href="dashboard.html">Sign in</PLButton>
+          <PLButton kind="primary" size="sm">Start free</PLButton>
+        </div>
+      </nav>
+
+      {/* Hero */}
+      <section className="hero">
+        <div className="hero-eyebrow">
+          <I.Rocket size={12} />
+          Now with AI-assisted summaries
+        </div>
+        <h1>The workspace where<br />your team's knowledge <em>lives.</em></h1>
+        <p className="hero-desc">
+          Fieldnotes brings together documents, decisions, and discussions in one warm, distraction-free space — so your team stays aligned without the noise.
+        </p>
+        <div className="hero-actions">
+          <PLButton kind="primary" icon={I.Plus} size="lg">Start for free</PLButton>
+          <PLButton kind="secondary" icon={I.Rocket} size="lg">Watch demo</PLButton>
+        </div>
+        <div className="hero-proof">
+          <PLAvatarGroup people={[
+            { name: "MT", color: "var(--pl-cat-plum)" },
+            { name: "JR", color: "var(--pl-cat-blue)" },
+            { name: "HS", color: "var(--pl-cat-rose)" },
+            { name: "EB", color: "var(--pl-cat-moss)" },
+            { name: "AC", color: "var(--pl-cat-gold, var(--pl-warn-400))" },
+          ]} max={5} />
+          <span style={{ marginLeft: 6 }}>Trusted by <strong style={{ color: "var(--pl-ink-1)" }}>4,200+</strong> teams</span>
+          <div className="hero-proof-sep" />
+          <span>⭐ 4.9 / 5 on G2</span>
+          <div className="hero-proof-sep" />
+          <span>SOC 2 Type II certified</span>
+        </div>
+      </section>
+
+      {/* Screenshot mockup */}
+      <div className="hero-screenshot">
+        <div className="screenshot-frame">
+          <div className="screenshot-bar">
+            <div className="dot" style={{ background: "var(--pl-danger-400)" }} />
+            <div className="dot" style={{ background: "var(--pl-warn-400)" }} />
+            <div className="dot" style={{ background: "var(--pl-ok-400)" }} />
+          </div>
+          <div className="screenshot-content">
+            <div className="screenshot-sidebar">
+              <div className="ss-item active" />
+              <div className="ss-item" />
+              <div className="ss-item" />
+              <div style={{ height: 16 }} />
+              <div className="ss-item" />
+              <div className="ss-item" />
+              <div className="ss-item" />
+            </div>
+            <div className="screenshot-body">
+              <div className="ss-heading" />
+              <div className="ss-line" />
+              <div className="ss-line short" />
+              <div className="ss-line" />
+              <div className="ss-line xshort" />
+              <div style={{ height: 8 }} />
+              <div className="ss-line short" />
+              <div className="ss-line" />
+              <div className="ss-line xshort" />
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <hr className="section-divider" />
+
+      {/* Features */}
+      <section className="section" id="features">
+        <div className="section-eyebrow">Features</div>
+        <h2 className="section-title">Everything your team needs to <em>think clearly.</em></h2>
+        <p className="section-desc">Fieldnotes is built for teams that value depth over noise — structured writing, smart organization, and real-time collaboration.</p>
+        <div className="feature-grid">
+          <Feature
+            icon={I.Book}
+            iconBg="var(--pl-accent-50)"
+            iconColor="var(--pl-accent-500)"
+            title="Structured docs"
+            desc="Write meeting notes, RFCs, project briefs, and runbooks with a rich editor that stays out of your way."
+          />
+          <Feature
+            icon={I.Layers}
+            iconBg="var(--pl-info-50)"
+            iconColor="var(--pl-info-500)"
+            title="Nested workspaces"
+            desc="Organize by team, project, or quarter. Drag-and-drop nesting keeps your knowledge hierarchy clean."
+          />
+          <Feature
+            icon={I.Megaphone}
+            iconBg="var(--pl-ok-50)"
+            iconColor="var(--pl-ok-500)"
+            title="Live collaboration"
+            desc="See cursors, highlights, and comments in real time. No more 'v2-final-FINAL' file names."
+          />
+          <Feature
+            icon={I.Search}
+            iconBg="var(--pl-warn-50)"
+            iconColor="var(--pl-warn-500)"
+            title="Instant search"
+            desc="Full-text search across all docs, comments, and attachments — results in under 200ms."
+          />
+          <Feature
+            icon={I.Shield}
+            iconBg="var(--pl-cat-rose-50, var(--pl-paper-1))"
+            iconColor="var(--pl-danger-500)"
+            title="Granular permissions"
+            desc="Set access per-workspace, per-doc, or per-block. Share externally with password-protected links."
+          />
+          <Feature
+            icon={I.Rocket}
+            iconBg="var(--pl-cat-moss-50, var(--pl-paper-1))"
+            iconColor="var(--pl-ok-600, var(--pl-ok-500))"
+            title="AI summaries"
+            desc="Fieldnotes can summarize long threads, generate action items, and surface related documents automatically."
+          />
+        </div>
+      </section>
+
+      <hr className="section-divider" />
+
+      {/* Testimonials */}
+      <section className="section" id="testimonials">
+        <div className="section-eyebrow">Customer stories</div>
+        <h2 className="section-title">Teams that have made the <em>switch.</em></h2>
+        <p className="section-desc">From scrappy startups to scaling orgs, Fieldnotes fits where your team works best.</p>
+        <div className="testimonials-grid">
+          <Testimonial
+            quote="Fieldnotes replaced four different tools for us. Our onboarding docs, decision logs, and sprint notes all live in one place now."
+            name="Priya Mehta"
+            role="Head of Product, Luma Labs"
+            color="var(--pl-cat-plum)"
+            initials="PM"
+          />
+          <Testimonial
+            quote="The search alone sold us. I can find a decision we made 18 months ago in about two seconds. That used to take a Slack rabbit hole."
+            name="Carlos Estrada"
+            role="Engineering Lead, Parachute"
+            color="var(--pl-cat-blue)"
+            initials="CE"
+          />
+          <Testimonial
+            quote="Honestly it's just beautiful to use. My team actually opens it. That's a bar a lot of tools don't clear."
+            name="Dana Kim"
+            role="Design Director, Commonroom"
+            color="var(--pl-cat-rose)"
+            initials="DK"
+          />
+        </div>
+      </section>
+
+      <hr className="section-divider" />
+
+      {/* Pricing */}
+      <section className="section" id="pricing">
+        <div className="section-eyebrow">Pricing</div>
+        <h2 className="section-title">Simple pricing, no <em>surprises.</em></h2>
+        <p className="section-desc">Every plan includes unlimited docs. Pay for the seats and features your team actually needs.</p>
+        <div className="pricing-grid">
+          <PlanCard
+            name="Starter"
+            price="0"
+            desc="For small teams getting organized."
+            cta="Get started free"
+            features={[
+              "Up to 5 members",
+              "Unlimited documents",
+              "Real-time collaboration",
+              "7-day version history",
+              "Community support",
+            ]}
+          />
+          <PlanCard
+            badge="Most popular"
+            name="Team"
+            price="12"
+            desc="For growing teams with serious documentation needs."
+            cta="Start 14-day trial"
+            featured
+            features={[
+              "Up to 50 members",
+              "Unlimited documents",
+              "AI summaries (50/mo)",
+              "90-day version history",
+              "Granular permissions",
+              "Priority email support",
+            ]}
+          />
+          <PlanCard
+            name="Enterprise"
+            price="38"
+            desc="For organizations that need control and compliance."
+            cta="Talk to sales"
+            features={[
+              "Unlimited members",
+              "Unlimited documents",
+              "AI summaries (unlimited)",
+              "Unlimited version history",
+              "SSO & SCIM provisioning",
+              "SOC 2 compliance reports",
+              "Dedicated success manager",
+            ]}
+          />
+        </div>
+      </section>
+
+      {/* CTA Banner */}
+      <div className="cta-banner">
+        <h2>Start writing with your team <em>today.</em></h2>
+        <p>No credit card required. Your first workspace is ready in 30 seconds.</p>
+        <div className="cta-banner-actions">
+          <PLButton
+            kind="primary"
+            icon={I.Plus}
+            size="lg"
+            style={{ background: "#fff", color: "var(--pl-accent-700)", borderColor: "transparent" }}
+          >
+            Create your workspace
+          </PLButton>
+          <PLButton
+            kind="ghost"
+            size="lg"
+            style={{ color: "rgba(255,255,255,0.85)", borderColor: "rgba(255,255,255,0.3)" }}
+          >
+            See all features
+          </PLButton>
+        </div>
+      </div>
+
+      {/* Footer */}
+      <footer className="footer">
+        <div className="footer-brand">
+          <I.Logo size={18} />
+          Fieldnotes
+        </div>
+        <div className="footer-links">
+          <a className="footer-link" href="#features">Features</a>
+          <a className="footer-link" href="#pricing">Pricing</a>
+          <a className="footer-link" href="dashboard.html">App</a>
+          <a className="footer-link" href="#">Blog</a>
+          <a className="footer-link" href="#">Privacy</a>
+        </div>
+        <div className="footer-copy">© 2026 Fieldnotes Inc.</div>
+      </footer>
+    </>
+  );
+};
+
+ReactDOM.createRoot(document.getElementById("root")).render(<App />);
+</script>
+</body>
+</html>

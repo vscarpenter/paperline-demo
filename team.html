@@ -1,0 +1,419 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1" />
+<title>Fieldnotes — Team</title>
+
+<link rel="preconnect" href="https://fonts.googleapis.com" />
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+<link href="https://fonts.googleapis.com/css2?family=Instrument+Sans:wght@400;500;600;700&family=Instrument+Serif:ital@0;1&family=JetBrains+Mono:wght@400;500;600&display=swap" rel="stylesheet" />
+<link rel="stylesheet" href="./node_modules/paperline/dist/paperline.css" />
+
+<style>
+  html, body { margin: 0; padding: 0; height: 100%; }
+  body { background: var(--pl-paper-0); font-family: var(--pl-font-sans); display: flex; min-height: 100vh; }
+
+  /* Sidebar (shared) */
+  .sidebar { width: 224px; flex-shrink: 0; background: var(--pl-paper-card); border-right: 1px solid var(--pl-hairline); display: flex; flex-direction: column; position: sticky; top: 0; height: 100vh; overflow-y: auto; }
+  .sidebar-brand { display: flex; align-items: center; gap: 10px; padding: 20px 18px 18px; border-bottom: 1px solid var(--pl-hairline); }
+  .sidebar-brand .name { font-family: var(--pl-font-serif); font-size: 18px; color: var(--pl-ink-1); }
+  .sidebar-brand .badge { margin-left: auto; font-size: 9px; font-weight: 700; background: var(--pl-accent-100); color: var(--pl-accent-700); border-radius: 4px; padding: 2px 6px; }
+  .nav-group { padding: 10px 10px 0; }
+  .nav-label { font-size: 10px; font-weight: 700; letter-spacing: 0.14em; text-transform: uppercase; color: var(--pl-ink-4); padding: 0 8px; margin-bottom: 4px; }
+  .nav-item { display: flex; align-items: center; gap: 9px; padding: 7px 10px; border-radius: 7px; font-size: 13px; font-weight: 500; color: var(--pl-ink-3); cursor: pointer; text-decoration: none; transition: background var(--pl-dur-1), color var(--pl-dur-1); margin-bottom: 1px; }
+  .nav-item:hover { background: var(--pl-paper-1); color: var(--pl-ink-1); }
+  .nav-item.active { background: var(--pl-accent-50); color: var(--pl-accent-700); font-weight: 600; }
+  .nav-count { margin-left: auto; font-size: 10px; font-weight: 700; font-family: var(--pl-font-mono); background: var(--pl-paper-2); color: var(--pl-ink-3); border-radius: 999px; padding: 1px 6px; }
+  .sidebar-footer { margin-top: auto; padding: 14px 10px; border-top: 1px solid var(--pl-hairline); }
+
+  /* Main layout */
+  .main { flex: 1; min-width: 0; display: flex; flex-direction: column; }
+  .topbar { height: 56px; display: flex; align-items: center; gap: 12px; padding: 0 28px; border-bottom: 1px solid var(--pl-hairline); background: var(--pl-paper-card); position: sticky; top: 0; z-index: 10; }
+  .topbar-actions { margin-left: auto; display: flex; align-items: center; gap: 8px; }
+  .content { padding: 28px; display: flex; flex-direction: column; gap: 24px; }
+
+  /* Page header */
+  .page-eyebrow { font-size: 11px; font-weight: 600; letter-spacing: 0.14em; text-transform: uppercase; color: var(--pl-ink-4); margin-bottom: 4px; }
+  .page-title { font-family: var(--pl-font-serif); font-size: 34px; font-weight: 400; letter-spacing: -0.02em; color: var(--pl-ink-1); margin: 0; line-height: 1; }
+  .page-title em { font-style: italic; color: var(--pl-accent-500); }
+
+  /* Stats */
+  .stats-row { display: grid; grid-template-columns: repeat(4, 1fr); gap: 14px; }
+
+  /* Cards */
+  .card { background: var(--pl-paper-card); border: 1px solid var(--pl-hairline-strong); border-radius: 12px; box-shadow: var(--pl-shadow-xs); overflow: hidden; }
+  .card-header { display: flex; align-items: center; justify-content: space-between; padding: 14px 20px 12px; border-bottom: 1px solid var(--pl-hairline); }
+  .card-title { font-size: 13px; font-weight: 600; color: var(--pl-ink-1); display: flex; align-items: center; gap: 7px; }
+  .card-body { padding: 16px 20px; }
+
+  /* Two-column */
+  .two-col { display: grid; grid-template-columns: 1fr 320px; gap: 18px; align-items: start; }
+
+  /* Member card */
+  .member-row {
+    display: flex;
+    align-items: center;
+    gap: 14px;
+    padding: 14px 20px;
+    border-bottom: 1px solid var(--pl-hairline);
+    transition: background var(--pl-dur-1);
+    cursor: pointer;
+  }
+  .member-row:last-child { border-bottom: none; }
+  .member-row:hover { background: var(--pl-paper-1); }
+  .member-info { flex: 1; min-width: 0; }
+  .member-name { font-size: 13.5px; font-weight: 600; color: var(--pl-ink-1); }
+  .member-email { font-size: 11.5px; color: var(--pl-ink-4); font-family: var(--pl-font-mono); margin-top: 1px; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+  .member-meta { display: flex; align-items: center; gap: 8px; flex-shrink: 0; }
+
+  /* Pending invite row */
+  .invite-row { display: flex; align-items: center; gap: 12px; padding: 11px 20px; border-bottom: 1px solid var(--pl-hairline); }
+  .invite-row:last-child { border-bottom: none; }
+  .invite-email { font-size: 13px; color: var(--pl-ink-2); font-family: var(--pl-font-mono); flex: 1; }
+
+  /* Role perm row */
+  .role-row { display: flex; align-items: flex-start; gap: 14px; padding: 14px 20px; border-bottom: 1px solid var(--pl-hairline); }
+  .role-row:last-child { border-bottom: none; }
+  .role-icon { width: 34px; height: 34px; border-radius: 8px; display: flex; align-items: center; justify-content: center; flex-shrink: 0; margin-top: 1px; }
+  .role-name { font-size: 13px; font-weight: 600; color: var(--pl-ink-1); margin-bottom: 2px; }
+  .role-desc { font-size: 12px; color: var(--pl-ink-4); line-height: 1.5; }
+</style>
+
+<script src="https://unpkg.com/react@18.3.1/umd/react.development.js"></script>
+<script src="https://unpkg.com/react-dom@18.3.1/umd/react-dom.development.js"></script>
+<script src="https://unpkg.com/@babel/standalone@7.29.0/babel.min.js"></script>
+</head>
+<body class="pl-root">
+<div id="root"></div>
+
+<script type="text/babel" src="./node_modules/paperline/dist/paperline-icons.global.jsx"></script>
+<script type="text/babel" src="./node_modules/paperline/dist/paperline-components.global.jsx"></script>
+
+<script type="text/babel">
+const { useState } = React;
+
+const NavItem = ({ icon: Icon, label, active, count, href = "#" }) => (
+  <a className={`nav-item${active ? " active" : ""}`} href={href}>
+    <Icon size={14} />
+    <span style={{ flex: 1 }}>{label}</span>
+    {count !== undefined && <span className="nav-count">{count}</span>}
+  </a>
+);
+
+const MEMBERS = [
+  { name: "Vinny Carpenter",  email: "vinny@fieldnotes.app",  initials: "VC", color: "var(--pl-cat-plum)",  role: "Admin",   status: "active",  joined: "Jan 2025",  docs: 22 },
+  { name: "Maya Tanaka",      email: "maya@fieldnotes.app",   initials: "MT", color: "var(--pl-cat-rose)",  role: "Editor",  status: "active",  joined: "Jan 2025",  docs: 9  },
+  { name: "Jonas Reyes",      email: "jonas@fieldnotes.app",  initials: "JR", color: "var(--pl-cat-blue)",  role: "Editor",  status: "active",  joined: "Feb 2025",  docs: 5  },
+  { name: "Hira Soltani",     email: "hira@fieldnotes.app",   initials: "HS", color: "var(--pl-cat-plum)",  role: "Editor",  status: "away",    joined: "Mar 2025",  docs: 7  },
+  { name: "Eli Berg",         email: "eli@fieldnotes.app",    initials: "EB", color: "var(--pl-cat-moss)",  role: "Viewer",  status: "active",  joined: "Mar 2025",  docs: 4  },
+  { name: "Dana Larsson",     email: "dana@fieldnotes.app",   initials: "DL", color: "var(--pl-cat-gold, var(--pl-warn-500))", role: "Editor", status: "active", joined: "Apr 2025", docs: 3 },
+  { name: "Priya Mehta",      email: "priya@fieldnotes.app",  initials: "PM", color: "var(--pl-cat-blue)",  role: "Viewer",  status: "active",  joined: "Apr 2025",  docs: 1  },
+  { name: "Santiago Cruz",    email: "santiago@fieldnotes.app",initials:"SC", color: "var(--pl-cat-rose)",  role: "Viewer",  status: "inactive",joined: "Apr 2025",  docs: 0  },
+];
+
+const PENDING = [
+  { email: "alex.foster@acme.com",   role: "Editor",  sent: "2 days ago" },
+  { email: "lena.horn@startup.io",   role: "Viewer",  sent: "5 days ago" },
+];
+
+const roleTone = { Admin: "danger", Editor: "accent", Viewer: "neutral" };
+const statusTone = { active: "ok", away: "warn", inactive: "neutral" };
+const statusLabel = { active: "Active", away: "Away", inactive: "Inactive" };
+
+const App = () => {
+  const [search, setSearch] = useState("");
+  const [inviteEmail, setInviteEmail] = useState("");
+  const [inviteRole, setInviteRole] = useState("Editor");
+  const [inviteSent, setInviteSent] = useState(false);
+  const [confirmRemove, setConfirmRemove] = useState(null);
+  const [theme, setTheme] = useState("light");
+
+  React.useEffect(() => {
+    document.body.classList.toggle("pl-dark", theme === "dark");
+  }, [theme]);
+
+  const filtered = MEMBERS.filter(m =>
+    m.name.toLowerCase().includes(search.toLowerCase()) ||
+    m.email.toLowerCase().includes(search.toLowerCase()) ||
+    m.role.toLowerCase().includes(search.toLowerCase())
+  );
+
+  const handleInvite = () => {
+    if (!inviteEmail.trim()) return;
+    setInviteSent(true);
+    setInviteEmail("");
+    setTimeout(() => setInviteSent(false), 3000);
+  };
+
+  return (
+    <div style={{ display: "flex", minHeight: "100vh" }}>
+
+      {/* Sidebar */}
+      <nav className="sidebar">
+        <div className="sidebar-brand">
+          <I.Logo size={24} />
+          <span className="name">Fieldnotes</span>
+          <span className="badge">BETA</span>
+        </div>
+        <div className="nav-group">
+          <NavItem icon={I.Home}      label="Home"      href="dashboard.html" />
+          <NavItem icon={I.Book}      label="My docs"   count={12} />
+          <NavItem icon={I.Inbox}     label="Inbox"     count={3} />
+          <NavItem icon={I.Search}    label="Search" />
+        </div>
+        <div className="nav-group" style={{ marginTop: 8 }}>
+          <div className="nav-label">Spaces</div>
+          <NavItem icon={I.Briefcase} label="Product" />
+          <NavItem icon={I.Layers}    label="Engineering" />
+          <NavItem icon={I.Flag}      label="Design" />
+          <NavItem icon={I.Megaphone} label="Marketing" />
+          <NavItem icon={I.Shield}    label="Legal" />
+        </div>
+        <div className="sidebar-footer">
+          <NavItem icon={I.Calendar}  label="Analytics"  href="analytics.html" />
+          <NavItem icon={I.Briefcase} label="Team"        active href="team.html" />
+          <NavItem icon={I.Settings}  label="Settings" />
+          <div style={{ padding: "12px 10px 2px", display: "flex", alignItems: "center", gap: 10 }}>
+            <PLAvatar name="VC" color="var(--pl-cat-plum)" size={28} />
+            <div style={{ flex: 1, minWidth: 0 }}>
+              <div style={{ fontSize: 12.5, fontWeight: 600, color: "var(--pl-ink-1)", overflow: "hidden", textOverflow: "ellipsis", whiteSpace: "nowrap" }}>Vinny Carpenter</div>
+              <div style={{ fontSize: 11, color: "var(--pl-ink-4)" }}>Admin</div>
+            </div>
+          </div>
+        </div>
+      </nav>
+
+      {/* Main */}
+      <div className="main">
+
+        {/* Topbar */}
+        <header className="topbar">
+          <PLBreadcrumbs items={[
+            { label: "Fieldnotes", href: "index.html" },
+            { label: "Team" },
+          ]} />
+          <div className="topbar-actions">
+            <PLButton kind="ghost" onClick={() => setTheme(t => t === "light" ? "dark" : "light")} aria-label="Toggle theme">
+              {theme === "light" ? <I.Moon size={14} /> : <I.Sun size={14} />}
+            </PLButton>
+            <PLButton kind="primary" icon={I.Plus} size="sm" onClick={() => document.getElementById("invite-card").scrollIntoView({ behavior: "smooth" })}>
+              Invite member
+            </PLButton>
+          </div>
+        </header>
+
+        {/* Content */}
+        <div className="content">
+
+          {/* Page heading */}
+          <div style={{ display: "flex", alignItems: "flex-end", justifyContent: "space-between" }}>
+            <div>
+              <div className="page-eyebrow">Workspace · Team management</div>
+              <h1 className="page-title">Your <em>team.</em></h1>
+            </div>
+            <PLAvatarGroup people={MEMBERS.map(m => ({ name: m.initials, color: m.color }))} max={6} />
+          </div>
+
+          {/* Stats */}
+          <div className="stats-row">
+            <PLStat label="Total members"    value="8"   delta="Across all roles"   tone="accent" />
+            <PLStat label="Active now"        value="6"   delta="75% of team"       tone="ok"     />
+            <PLStat label="Pending invites"   value="2"   delta="Awaiting response"  tone="warn"   />
+            <PLStat label="Plan seats used"   value="8/50" delta="42 remaining"     tone="neutral" />
+          </div>
+
+          <div className="two-col">
+            {/* Members list */}
+            <div style={{ display: "flex", flexDirection: "column", gap: 18 }}>
+
+              {/* Member table */}
+              <div className="card">
+                <div className="card-header">
+                  <span className="card-title"><I.Briefcase size={13} /> Members ({MEMBERS.length})</span>
+                  <PLInput icon={I.Search} placeholder="Search members…" value={search} onChange={e => setSearch(e.target.value)} />
+                </div>
+                <div>
+                  {filtered.length === 0 && (
+                    <PLEmptyState icon={I.Search} title="No members found" description={`No results for "${search}".`} />
+                  )}
+                  {filtered.map(m => (
+                    <div key={m.email} className="member-row">
+                      <PLAvatar name={m.initials} color={m.color} size={36} />
+                      <div className="member-info">
+                        <div className="member-name">{m.name}</div>
+                        <div className="member-email">{m.email}</div>
+                      </div>
+                      <div className="member-meta">
+                        <PLBadge tone={statusTone[m.status]} dot>{statusLabel[m.status]}</PLBadge>
+                        <PLBadge tone={roleTone[m.role]}>{m.role}</PLBadge>
+                        <span style={{ fontFamily: "var(--pl-font-mono)", fontSize: 11, color: "var(--pl-ink-4)", minWidth: 44, textAlign: "right" }}>{m.docs} docs</span>
+                        {m.role !== "Admin" && (
+                          <PLButton kind="ghost" size="sm" aria-label="Remove" onClick={() => setConfirmRemove(m.name)}>
+                            <I.X size={12} />
+                          </PLButton>
+                        )}
+                      </div>
+                    </div>
+                  ))}
+                </div>
+              </div>
+
+              {/* Pending invites */}
+              <div className="card">
+                <div className="card-header">
+                  <span className="card-title"><I.Inbox size={13} /> Pending invites</span>
+                  <PLBadge tone="warn">{PENDING.length}</PLBadge>
+                </div>
+                {PENDING.map(inv => (
+                  <div key={inv.email} className="invite-row">
+                    <I.Megaphone size={14} style={{ color: "var(--pl-warn-500)", flexShrink: 0 }} />
+                    <div className="invite-email">{inv.email}</div>
+                    <PLBadge tone="neutral">{inv.role}</PLBadge>
+                    <span style={{ fontSize: 11, color: "var(--pl-ink-4)", fontFamily: "var(--pl-font-mono)" }}>Sent {inv.sent}</span>
+                    <PLButton kind="ghost" size="sm">Resend</PLButton>
+                    <PLButton kind="ghost" size="sm"><I.X size={12} /></PLButton>
+                  </div>
+                ))}
+              </div>
+
+            </div>
+
+            {/* Right column */}
+            <div style={{ display: "flex", flexDirection: "column", gap: 18 }}>
+
+              {/* Invite form */}
+              <div className="card" id="invite-card">
+                <div className="card-header">
+                  <span className="card-title"><I.Plus size={13} /> Invite a member</span>
+                </div>
+                <div className="card-body" style={{ display: "flex", flexDirection: "column", gap: 14 }}>
+                  <PLField label="Email address">
+                    <PLInput
+                      placeholder="colleague@company.com"
+                      value={inviteEmail}
+                      onChange={e => setInviteEmail(e.target.value)}
+                    />
+                  </PLField>
+                  <PLField label="Role">
+                    <PLSelect
+                      value={inviteRole}
+                      onChange={e => setInviteRole(e.target.value)}
+                      options={[
+                        { value: "Admin",  label: "Admin — full control" },
+                        { value: "Editor", label: "Editor — create & edit docs" },
+                        { value: "Viewer", label: "Viewer — read-only access" },
+                      ]}
+                    />
+                  </PLField>
+                  {inviteSent && (
+                    <PLAlert tone="ok" icon={I.Flag}>Invite sent to <strong>{inviteEmail || "that address"}</strong>.</PLAlert>
+                  )}
+                  <PLButton kind="primary" icon={I.Megaphone} onClick={handleInvite} style={{ width: "100%" }}>
+                    Send invite
+                  </PLButton>
+                </div>
+              </div>
+
+              {/* Role overview */}
+              <div className="card">
+                <div className="card-header">
+                  <span className="card-title"><I.Shield size={13} /> Role permissions</span>
+                </div>
+                {[
+                  {
+                    icon: I.Shield,
+                    bg: "var(--pl-danger-50)",
+                    color: "var(--pl-danger-500)",
+                    name: "Admin",
+                    desc: "Manage billing, members, and all workspace settings. Can delete the workspace.",
+                    count: 1,
+                    tone: "danger",
+                  },
+                  {
+                    icon: I.Book,
+                    bg: "var(--pl-accent-50)",
+                    color: "var(--pl-accent-500)",
+                    name: "Editor",
+                    desc: "Create, edit, and publish documents. Manage spaces they own.",
+                    count: 4,
+                    tone: "accent",
+                  },
+                  {
+                    icon: I.Search,
+                    bg: "var(--pl-paper-2)",
+                    color: "var(--pl-ink-3)",
+                    name: "Viewer",
+                    desc: "Read-only access to all published documents in the workspace.",
+                    count: 3,
+                    tone: "neutral",
+                  },
+                ].map(({ icon: Icon, bg, color, name, desc, count, tone }) => (
+                  <div key={name} className="role-row">
+                    <div className="role-icon" style={{ background: bg }}>
+                      <Icon size={16} style={{ color }} />
+                    </div>
+                    <div style={{ flex: 1 }}>
+                      <div style={{ display: "flex", alignItems: "center", gap: 8 }}>
+                        <div className="role-name">{name}</div>
+                        <PLBadge tone={tone}>{count} member{count !== 1 ? "s" : ""}</PLBadge>
+                      </div>
+                      <div className="role-desc">{desc}</div>
+                    </div>
+                  </div>
+                ))}
+              </div>
+
+              {/* Team composition */}
+              <div className="card">
+                <div className="card-header">
+                  <span className="card-title"><I.Flag size={13} /> Joined over time</span>
+                </div>
+                <div className="card-body" style={{ display: "flex", flexDirection: "column", gap: 10 }}>
+                  {[
+                    { month: "Jan 2025", count: 2, pct: 100 },
+                    { month: "Feb 2025", count: 1, pct: 50  },
+                    { month: "Mar 2025", count: 2, pct: 100 },
+                    { month: "Apr 2025", count: 3, pct: 100 },
+                  ].map(({ month, count, pct }) => (
+                    <div key={month} style={{ display: "flex", alignItems: "center", gap: 10 }}>
+                      <div style={{ fontSize: 11.5, fontFamily: "var(--pl-font-mono)", color: "var(--pl-ink-4)", minWidth: 70 }}>{month}</div>
+                      <PLProgress value={pct} style={{ flex: 1 }} />
+                      <div style={{ fontSize: 12, fontFamily: "var(--pl-font-mono)", color: "var(--pl-ink-2)", minWidth: 24, textAlign: "right" }}>+{count}</div>
+                    </div>
+                  ))}
+                </div>
+              </div>
+
+            </div>
+          </div>
+        </div>
+      </div>
+
+      {/* Confirm remove modal */}
+      {confirmRemove && (
+        <PLModal
+          title={`Remove ${confirmRemove}?`}
+          open
+          onClose={() => setConfirmRemove(null)}
+          footer={
+            <PLCluster gap={8} style={{ justifyContent: "flex-end" }}>
+              <PLButton kind="secondary" onClick={() => setConfirmRemove(null)}>Cancel</PLButton>
+              <PLButton kind="danger" onClick={() => setConfirmRemove(null)}>Remove member</PLButton>
+            </PLCluster>
+          }
+        >
+          <p style={{ margin: 0, fontSize: 14, color: "var(--pl-ink-2)", lineHeight: 1.6 }}>
+            <strong>{confirmRemove}</strong> will lose access to all Fieldnotes workspaces and documents immediately.
+            Their authored documents will remain but will be unassigned.
+          </p>
+        </PLModal>
+      )}
+    </div>
+  );
+};
+
+ReactDOM.createRoot(document.getElementById("root")).render(<App />);
+</script>
+</body>
+</html>

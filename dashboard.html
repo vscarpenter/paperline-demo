@@ -1,0 +1,484 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1" />
+<title>Fieldnotes — Dashboard</title>
+
+<link rel="preconnect" href="https://fonts.googleapis.com" />
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+<link href="https://fonts.googleapis.com/css2?family=Instrument+Sans:wght@400;500;600;700&family=Instrument+Serif:ital@0;1&family=JetBrains+Mono:wght@400;500;600&display=swap" rel="stylesheet" />
+<link rel="stylesheet" href="./node_modules/paperline/dist/paperline.css" />
+
+<style>
+  html, body { margin: 0; padding: 0; height: 100%; }
+  body { background: var(--pl-paper-0); font-family: var(--pl-font-sans); display: flex; min-height: 100vh; }
+
+  /* Sidebar */
+  .sidebar {
+    width: 224px;
+    flex-shrink: 0;
+    background: var(--pl-paper-card);
+    border-right: 1px solid var(--pl-hairline);
+    display: flex;
+    flex-direction: column;
+    padding: 0;
+    position: sticky;
+    top: 0;
+    height: 100vh;
+    overflow-y: auto;
+  }
+  .sidebar-brand {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    padding: 20px 18px 18px;
+    border-bottom: 1px solid var(--pl-hairline);
+  }
+  .sidebar-brand .name { font-family: var(--pl-font-serif); font-size: 18px; color: var(--pl-ink-1); letter-spacing: -0.01em; }
+  .sidebar-brand .badge {
+    margin-left: auto;
+    font-size: 9px;
+    font-weight: 700;
+    letter-spacing: 0.06em;
+    background: var(--pl-accent-100);
+    color: var(--pl-accent-700);
+    border-radius: 4px;
+    padding: 2px 6px;
+    font-family: var(--pl-font-sans);
+  }
+  .nav-group { padding: 10px 10px 0; }
+  .nav-group + .nav-group { padding-top: 8px; }
+  .nav-label {
+    font-size: 10px;
+    font-weight: 700;
+    letter-spacing: 0.14em;
+    text-transform: uppercase;
+    color: var(--pl-ink-4);
+    padding: 0 8px;
+    margin-bottom: 4px;
+    font-family: var(--pl-font-sans);
+  }
+  .nav-item {
+    display: flex;
+    align-items: center;
+    gap: 9px;
+    padding: 7px 10px;
+    border-radius: 7px;
+    font-size: 13px;
+    font-weight: 500;
+    color: var(--pl-ink-3);
+    cursor: pointer;
+    text-decoration: none;
+    transition: background var(--pl-dur-1), color var(--pl-dur-1);
+    margin-bottom: 1px;
+  }
+  .nav-item:hover { background: var(--pl-paper-1); color: var(--pl-ink-1); }
+  .nav-item.active { background: var(--pl-accent-50); color: var(--pl-accent-700); font-weight: 600; }
+  .nav-item.active svg { color: var(--pl-accent-500); }
+  .nav-count {
+    margin-left: auto;
+    font-size: 10px;
+    font-weight: 700;
+    font-family: var(--pl-font-mono);
+    background: var(--pl-paper-2);
+    color: var(--pl-ink-3);
+    border-radius: 999px;
+    padding: 1px 6px;
+  }
+  .nav-item.active .nav-count { background: var(--pl-accent-100); color: var(--pl-accent-700); }
+  .sidebar-footer {
+    margin-top: auto;
+    padding: 14px 10px;
+    border-top: 1px solid var(--pl-hairline);
+  }
+
+  /* Main */
+  .main { flex: 1; min-width: 0; display: flex; flex-direction: column; }
+  .topbar {
+    height: 56px;
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    padding: 0 28px;
+    border-bottom: 1px solid var(--pl-hairline);
+    background: var(--pl-paper-card);
+    position: sticky;
+    top: 0;
+    z-index: 10;
+  }
+  .topbar-actions { margin-left: auto; display: flex; align-items: center; gap: 8px; }
+  .content { padding: 28px; display: flex; flex-direction: column; gap: 24px; }
+
+  /* Page header */
+  .page-header { display: flex; align-items: flex-end; justify-content: space-between; gap: 16px; }
+  .page-eyebrow { font-size: 11px; font-weight: 600; letter-spacing: 0.14em; text-transform: uppercase; color: var(--pl-ink-4); margin-bottom: 4px; font-family: var(--pl-font-sans); }
+  .page-title { font-family: var(--pl-font-serif); font-size: 34px; font-weight: 400; letter-spacing: -0.02em; color: var(--pl-ink-1); margin: 0; line-height: 1; }
+  .page-title em { font-style: italic; color: var(--pl-accent-500); }
+
+  /* Stats */
+  .stats-row { display: grid; grid-template-columns: repeat(4, 1fr); gap: 14px; }
+
+  /* Two-column layout */
+  .two-col { display: grid; grid-template-columns: 1fr 340px; gap: 18px; align-items: start; }
+
+  /* Card */
+  .card {
+    background: var(--pl-paper-card);
+    border: 1px solid var(--pl-hairline-strong);
+    border-radius: 12px;
+    box-shadow: var(--pl-shadow-xs);
+    overflow: hidden;
+  }
+  .card-header {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding: 14px 20px 12px;
+    border-bottom: 1px solid var(--pl-hairline);
+  }
+  .card-title { font-size: 13px; font-weight: 600; color: var(--pl-ink-1); display: flex; align-items: center; gap: 7px; }
+  .card-body { padding: 16px 20px; }
+  .card-body-flush { /* tables */ }
+
+  /* Activity feed */
+  .feed-item { display: flex; gap: 12px; padding: 11px 20px; border-bottom: 1px solid var(--pl-hairline); }
+  .feed-item:last-child { border-bottom: none; }
+  .feed-dot { width: 8px; height: 8px; border-radius: 999px; margin-top: 5px; flex-shrink: 0; }
+  .feed-body { flex: 1; }
+  .feed-text { font-size: 12.5px; color: var(--pl-ink-2); line-height: 1.5; }
+  .feed-text strong { color: var(--pl-ink-1); font-weight: 600; }
+  .feed-text em { font-style: italic; }
+  .feed-time { font-family: var(--pl-font-mono); font-size: 10px; color: var(--pl-ink-4); margin-top: 2px; }
+
+  /* Bar chart */
+  .bar-chart { display: flex; align-items: flex-end; gap: 5px; height: 72px; }
+  .bar { flex: 1; border-radius: 3px 3px 0 0; background: var(--pl-accent-100); transition: background var(--pl-dur-1); }
+  .bar.hi { background: var(--pl-accent-400); }
+  .bar-labels { display: flex; gap: 5px; margin-top: 5px; }
+  .bar-labels span { flex: 1; text-align: center; font-family: var(--pl-font-mono); font-size: 9px; color: var(--pl-ink-4); }
+
+  /* Quick-action list */
+  .qa-item {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    padding: 10px 20px;
+    border-bottom: 1px solid var(--pl-hairline);
+    cursor: pointer;
+    transition: background var(--pl-dur-1);
+    text-decoration: none;
+  }
+  .qa-item:last-child { border-bottom: none; }
+  .qa-item:hover { background: var(--pl-paper-1); }
+  .qa-label { font-size: 13px; font-weight: 500; color: var(--pl-ink-1); }
+  .qa-sub { font-size: 11px; color: var(--pl-ink-4); margin-top: 1px; }
+</style>
+
+<script src="https://unpkg.com/react@18.3.1/umd/react.development.js"></script>
+<script src="https://unpkg.com/react-dom@18.3.1/umd/react-dom.development.js"></script>
+<script src="https://unpkg.com/@babel/standalone@7.29.0/babel.min.js"></script>
+</head>
+<body class="pl-root">
+<div id="root"></div>
+
+<script type="text/babel" src="./node_modules/paperline/dist/paperline-icons.global.jsx"></script>
+<script type="text/babel" src="./node_modules/paperline/dist/paperline-components.global.jsx"></script>
+
+<script type="text/babel">
+const { useState } = React;
+
+const NavItem = ({ icon: Icon, label, active, count, href = "#" }) => (
+  <a className={`nav-item${active ? " active" : ""}`} href={href}>
+    <Icon size={14} />
+    <span style={{ flex: 1 }}>{label}</span>
+    {count !== undefined && <span className="nav-count">{count}</span>}
+  </a>
+);
+
+const FeedItem = ({ dotColor, children, time }) => (
+  <div className="feed-item">
+    <div className="feed-dot" style={{ background: dotColor }} />
+    <div className="feed-body">
+      <div className="feed-text">{children}</div>
+      <div className="feed-time">{time}</div>
+    </div>
+  </div>
+);
+
+const BarChart = ({ data, labels, highlight }) => (
+  <div>
+    <div className="bar-chart">
+      {data.map((v, i) => <div key={i} className={`bar${i === highlight ? " hi" : ""}`} style={{ height: `${v}%` }} />)}
+    </div>
+    <div className="bar-labels">
+      {labels.map((l, i) => <span key={i}>{l}</span>)}
+    </div>
+  </div>
+);
+
+const App = () => {
+  const [search, setSearch] = useState("");
+  const [theme, setTheme] = useState("light");
+
+  React.useEffect(() => {
+    document.body.classList.toggle("pl-dark", theme === "dark");
+  }, [theme]);
+
+  const docs = [
+    { title: "Q2 Product Roadmap",       space: "Product",     author: "Hira S.",  status: "Published",  tone: "ok",     updated: "Today",         views: 142 },
+    { title: "Engineering Principles",   space: "Engineering", author: "Jonas R.", status: "Draft",      tone: "warn",   updated: "Yesterday",     views: 38  },
+    { title: "Brand Guidelines 2026",    space: "Design",      author: "Maya T.",  status: "Published",  tone: "ok",     updated: "May 2",         views: 311 },
+    { title: "Onboarding Checklist",     space: "HR",          author: "Dana L.",  status: "Published",  tone: "ok",     updated: "Apr 28",        views: 87  },
+    { title: "Incident Post-mortem #14", space: "Engineering", author: "Eli B.",   status: "In review",  tone: "info",   updated: "Apr 26",        views: 56  },
+    { title: "Partnership MOU — Avero",  space: "Legal",       author: "Priya M.", status: "Archived",   tone: "neutral",updated: "Mar 15",        views: 12  },
+  ];
+
+  const filtered = docs.filter(d =>
+    d.title.toLowerCase().includes(search.toLowerCase()) ||
+    d.space.toLowerCase().includes(search.toLowerCase()) ||
+    d.author.toLowerCase().includes(search.toLowerCase())
+  );
+
+  const spaceColors = {
+    Product: "var(--pl-cat-plum)",
+    Engineering: "var(--pl-cat-blue)",
+    Design: "var(--pl-cat-rose)",
+    HR: "var(--pl-cat-moss)",
+    Legal: "var(--pl-cat-gold, var(--pl-warn-400))",
+  };
+
+  return (
+    <div style={{ display: "flex", minHeight: "100vh" }}>
+
+      {/* Sidebar */}
+      <nav className="sidebar">
+        <div className="sidebar-brand">
+          <I.Logo size={24} />
+          <span className="name">Fieldnotes</span>
+          <span className="badge">BETA</span>
+        </div>
+
+        <div className="nav-group">
+          <NavItem icon={I.Home}      label="Home"      active href="dashboard.html" />
+          <NavItem icon={I.Book}      label="My docs"   count={12} />
+          <NavItem icon={I.Inbox}     label="Inbox"     count={3} />
+          <NavItem icon={I.Search}    label="Search" />
+        </div>
+
+        <div className="nav-group" style={{ marginTop: 8 }}>
+          <div className="nav-label">Spaces</div>
+          <NavItem icon={I.Briefcase} label="Product" />
+          <NavItem icon={I.Layers}    label="Engineering" />
+          <NavItem icon={I.Flag}      label="Design" />
+          <NavItem icon={I.Megaphone} label="Marketing" />
+          <NavItem icon={I.Shield}    label="Legal" />
+        </div>
+
+        <div className="sidebar-footer">
+          <NavItem icon={I.Calendar}  label="Analytics"  href="analytics.html" />
+          <NavItem icon={I.Briefcase} label="Team"        href="team.html" />
+          <NavItem icon={I.Settings}  label="Settings" />
+          <div style={{ padding: "12px 10px 2px", display: "flex", alignItems: "center", gap: 10 }}>
+            <PLAvatar name="VC" color="var(--pl-cat-plum)" size={28} />
+            <div style={{ flex: 1, minWidth: 0 }}>
+              <div style={{ fontSize: 12.5, fontWeight: 600, color: "var(--pl-ink-1)", overflow: "hidden", textOverflow: "ellipsis", whiteSpace: "nowrap" }}>Vinny Carpenter</div>
+              <div style={{ fontSize: 11, color: "var(--pl-ink-4)" }}>Admin</div>
+            </div>
+            <I.More size={14} style={{ color: "var(--pl-ink-4)", flexShrink: 0 }} />
+          </div>
+        </div>
+      </nav>
+
+      {/* Main */}
+      <div className="main">
+
+        {/* Topbar */}
+        <header className="topbar">
+          <PLBreadcrumbs items={[
+            { label: "Fieldnotes", href: "index.html" },
+            { label: "Home" },
+          ]} />
+          <div className="topbar-actions">
+            <PLButton kind="ghost" aria-label="Toggle theme" onClick={() => setTheme(t => t === "light" ? "dark" : "light")}>
+              {theme === "light" ? <I.Moon size={14} /> : <I.Sun size={14} />}
+            </PLButton>
+            <PLButton kind="ghost" icon={I.Inbox} size="sm" aria-label="Inbox">
+              <PLBadge tone="danger" dot>3</PLBadge>
+            </PLButton>
+            <PLButton kind="primary" icon={I.Plus} size="sm">New doc</PLButton>
+          </div>
+        </header>
+
+        {/* Content */}
+        <div className="content">
+
+          {/* Page heading */}
+          <div className="page-header">
+            <div>
+              <div className="page-eyebrow">Fieldnotes · May 2026</div>
+              <h1 className="page-title">Good morning, <em>Vinny.</em></h1>
+            </div>
+            <PLCluster gap={8}>
+              <PLButton kind="secondary" icon={I.Download} size="sm">Export</PLButton>
+              <PLButton kind="secondary" icon={I.Filter} size="sm">Filter</PLButton>
+            </PLCluster>
+          </div>
+
+          {/* Stats */}
+          <div className="stats-row">
+            <PLStat label="Total documents"  value="248"   delta="+14 this week"  tone="accent" />
+            <PLStat label="Active members"   value="18"    delta="+2 this month"  tone="ok"     />
+            <PLStat label="Docs in review"   value="6"     delta="+1 today"       tone="info"   />
+            <PLStat label="Pending approvals" value="3"    delta="Action needed"  tone="warn"   />
+          </div>
+
+          {/* Two-column */}
+          <div className="two-col">
+
+            {/* Docs table */}
+            <div>
+              <div className="card">
+                <div className="card-header">
+                  <span className="card-title">
+                    <I.Book size={14} />
+                    Recent documents
+                  </span>
+                  <div style={{ display: "flex", gap: 8 }}>
+                    <PLInput
+                      icon={I.Search}
+                      placeholder="Search…"
+                      value={search}
+                      onChange={e => setSearch(e.target.value)}
+                    />
+                    <PLButton kind="secondary" icon={I.Filter} size="sm" aria-label="Filter" />
+                  </div>
+                </div>
+                <div className="card-body-flush">
+                  <PLTable
+                    columns={[
+                      {
+                        key: "title",
+                        label: "Document",
+                        render: r => (
+                          <div style={{ display: "flex", alignItems: "center", gap: 10 }}>
+                            <PLAvatar name={r.space.slice(0,2)} color={spaceColors[r.space]} size={26} />
+                            <div>
+                              <div style={{ fontSize: 13, fontWeight: 600, color: "var(--pl-ink-1)" }}>{r.title}</div>
+                              <div style={{ fontSize: 11, color: "var(--pl-ink-4)", fontFamily: "var(--pl-font-mono)" }}>{r.space} · {r.author}</div>
+                            </div>
+                          </div>
+                        ),
+                      },
+                      {
+                        key: "status",
+                        label: "Status",
+                        render: r => <PLBadge tone={r.tone} dot>{r.status}</PLBadge>,
+                      },
+                      {
+                        key: "views",
+                        label: "Views",
+                        render: r => <span style={{ fontFamily: "var(--pl-font-mono)", fontSize: 12, color: "var(--pl-ink-3)" }}>{r.views}</span>,
+                      },
+                      {
+                        key: "updated",
+                        label: "Updated",
+                        render: r => <span style={{ fontFamily: "var(--pl-font-mono)", fontSize: 11.5, color: "var(--pl-ink-4)" }}>{r.updated}</span>,
+                      },
+                    ]}
+                    rows={filtered}
+                  />
+                  {filtered.length === 0 && (
+                    <PLEmptyState icon={I.Search} title="No results" description={`No docs matching "${search}".`} />
+                  )}
+                </div>
+              </div>
+            </div>
+
+            {/* Right column */}
+            <div style={{ display: "flex", flexDirection: "column", gap: 18 }}>
+
+              {/* Activity chart */}
+              <div className="card">
+                <div className="card-header">
+                  <span className="card-title"><I.Calendar size={13} /> Doc activity</span>
+                  <PLBadge tone="ok" dot>This week</PLBadge>
+                </div>
+                <div className="card-body">
+                  <BarChart
+                    data={[35, 55, 48, 62, 70, 44, 80]}
+                    labels={["M","T","W","T","F","S","S"]}
+                    highlight={6}
+                  />
+                  <PLDivider style={{ margin: "14px 0 10px" }} />
+                  <div style={{ display: "flex", justifyContent: "space-between" }}>
+                    {[["80", "Today"], ["62", "Fri"], ["↑ 29%", "vs last wk"]].map(([v, l], i) => (
+                      <div key={i} style={{ textAlign: "center" }}>
+                        <div style={{ fontSize: 17, fontWeight: 700, fontFamily: "var(--pl-font-mono)", color: i === 2 ? "var(--pl-ok-500)" : "var(--pl-ink-1)" }}>{v}</div>
+                        <div style={{ fontSize: 10.5, color: "var(--pl-ink-4)" }}>{l}</div>
+                      </div>
+                    ))}
+                  </div>
+                </div>
+              </div>
+
+              {/* Quick actions */}
+              <div className="card">
+                <div className="card-header">
+                  <span className="card-title"><I.Rocket size={13} /> Quick actions</span>
+                </div>
+                {[
+                  { icon: I.Plus,       label: "New document",      sub: "Start writing instantly" },
+                  { icon: I.Megaphone,  label: "Share workspace",    sub: "Invite a teammate" },
+                  { icon: I.Book,       label: "Browse templates",   sub: "Meeting notes, RFCs, briefs…" },
+                  { icon: I.Calendar,   label: "View analytics",     sub: "See engagement metrics", href: "analytics.html" },
+                  { icon: I.Briefcase,  label: "Manage team",        sub: "Roles & permissions", href: "team.html" },
+                ].map(({ icon: Icon, label, sub, href = "#" }) => (
+                  <a key={label} className="qa-item" href={href}>
+                    <div style={{ width: 30, height: 30, borderRadius: 8, background: "var(--pl-accent-50)", display: "flex", alignItems: "center", justifyContent: "center", flexShrink: 0 }}>
+                      <Icon size={14} style={{ color: "var(--pl-accent-600, var(--pl-accent-500))" }} />
+                    </div>
+                    <div>
+                      <div className="qa-label">{label}</div>
+                      <div className="qa-sub">{sub}</div>
+                    </div>
+                    <I.ChevRight size={13} style={{ color: "var(--pl-ink-4)", marginLeft: "auto" }} />
+                  </a>
+                ))}
+              </div>
+
+              {/* Activity feed */}
+              <div className="card">
+                <div className="card-header">
+                  <span className="card-title"><I.Inbox size={13} /> Recent activity</span>
+                  <PLButton kind="ghost" size="sm">View all</PLButton>
+                </div>
+                <FeedItem dotColor="var(--pl-ok-500)"     time="Today · 9:42 am">
+                  <strong>Maya</strong> published <em>Brand Guidelines 2026</em>.
+                </FeedItem>
+                <FeedItem dotColor="var(--pl-info-500)"   time="Today · 8:15 am">
+                  <strong>Eli</strong> opened a comment on <em>Incident Post-mortem #14</em>.
+                </FeedItem>
+                <FeedItem dotColor="var(--pl-accent-400)" time="Yesterday · 5:14 pm">
+                  <strong>Hira</strong> created <em>Q2 Product Roadmap</em>.
+                </FeedItem>
+                <FeedItem dotColor="var(--pl-warn-500)"   time="Yesterday · 2:00 pm">
+                  <strong>Jonas</strong> requested review on <em>Engineering Principles</em>.
+                </FeedItem>
+                <FeedItem dotColor="var(--pl-ok-500)"     time="Apr 28 · 11:30 am">
+                  <strong>Dana</strong> updated <em>Onboarding Checklist</em>.
+                </FeedItem>
+              </div>
+
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  );
+};
+
+ReactDOM.createRoot(document.getElementById("root")).render(<App />);
+</script>
+</body>
+</html>
