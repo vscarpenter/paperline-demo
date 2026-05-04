@@ -1,6 +1,9 @@
 # Dependencies
 node_modules/
 
+# Vendor is committed intentionally
+!vendor/
+
 # macOS
 .DS_Store
 

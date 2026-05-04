@@ -1,0 +1,258 @@
+/* AUTO-GENERATED from src/styles/paperline.css */
+/* ==========================================================================
+   Paperline — Warm Editorial Design System
+   v1.0 · A reusable design system for any app
+   ==========================================================================
+   Drop this file into your project, link it in <head>, and load:
+     Instrument Sans, Instrument Serif, JetBrains Mono (Google Fonts)
+   Then either consume the CSS variables directly, or port them to your
+   Tailwind config / styled system.
+   ========================================================================== */
+
+:root {
+  /* === Surfaces (paper) ============================================== */
+  --pl-paper-0:    #FBF8F3;   /* page bg, warmest */
+  --pl-paper-1:    #F5F1EA;   /* sidebar / muted surface */
+  --pl-paper-2:    #EDE7DC;   /* recessed panels, columns */
+  --pl-paper-3:    #E4DCCC;   /* dividers, strong borders */
+  --pl-paper-card: #FFFEFB;   /* card surface, slightly warmer than white */
+
+  --pl-hairline:        rgba(28, 26, 23, 0.08);
+  --pl-hairline-strong: rgba(28, 26, 23, 0.14);
+
+  /* === Ink (text) ==================================================== */
+  --pl-ink-1: #1C1A17;        /* primary text */
+  --pl-ink-2: #3A352E;        /* body */
+  --pl-ink-3: #6B6358;        /* secondary */
+  --pl-ink-4: #948C7E;        /* tertiary / placeholder */
+  --pl-ink-5: #BDB4A4;        /* disabled */
+
+  /* === Accent: Plum ================================================== */
+  --pl-accent-50:  #F6F0FA;
+  --pl-accent-100: #EADDF3;
+  --pl-accent-200: #D6BCE6;
+  --pl-accent-300: #B690CE;
+  --pl-accent-400: #8E62AB;
+  --pl-accent-500: #6B4A87;   /* primary brand */
+  --pl-accent-600: #553A6C;   /* hover/pressed */
+  --pl-accent-700: #402B52;
+  --pl-accent-ink: #FFFEFB;
+
+  /* === Status (muted, editorial — never candy) ======================= */
+  --pl-ok-50:  #EDF2EC; --pl-ok-200: #BFD3BC; --pl-ok-500: #4F7A4B; --pl-ok-700: #34522F;
+  --pl-warn-50:#FBF1E1; --pl-warn-200:#EDD3A2; --pl-warn-500:#B07820; --pl-warn-700:#7A5210;
+  --pl-danger-50:#F8E9E5; --pl-danger-200:#E6BBB0; --pl-danger-500:#A8412A; --pl-danger-700:#76281A;
+  --pl-info-50:#E8EEF2; --pl-info-200:#B5C6D2; --pl-info-500:#3F627A;
+
+  /* === Categorical palette (charts, tags, board dots, anything that
+         needs visually distinct hues that all sit in the same family) === */
+  --pl-cat-blue:  #3F627A;
+  --pl-cat-amber: #B07820;
+  --pl-cat-green: #4F7A4B;
+  --pl-cat-rose:  #A8412A;
+  --pl-cat-plum:  #6B4A87;
+  --pl-cat-clay:  #9A6240;
+  --pl-cat-moss:  #5C6B3C;
+  --pl-cat-teal:  #3D6E6B;
+
+  /* === Type ========================================================== */
+  --pl-font-sans:  "Instrument Sans", ui-sans-serif, system-ui, sans-serif;
+  --pl-font-serif: "Instrument Serif", ui-serif, Georgia, serif;
+  --pl-font-mono:  "JetBrains Mono", ui-monospace, "SF Mono", monospace;
+
+  /* === Spacing (4px rhythm) ========================================== */
+  --pl-s-0:  0px;
+  --pl-s-1:  4px;
+  --pl-s-2:  8px;
+  --pl-s-3:  12px;
+  --pl-s-4:  16px;
+  --pl-s-5:  20px;
+  --pl-s-6:  24px;
+  --pl-s-7:  32px;
+  --pl-s-8:  40px;
+  --pl-s-9:  56px;
+  --pl-s-10: 72px;
+  --pl-s-11: 96px;
+
+  /* === Radius ======================================================== */
+  --pl-r-xs:  4px;
+  --pl-r-sm:  6px;
+  --pl-r-md:  8px;
+  --pl-r-lg:  12px;
+  --pl-r-xl:  16px;
+  --pl-r-2xl: 20px;
+  --pl-r-pill: 999px;
+
+  /* === Shadows (warm — base rgb 60/45/25, never pure black) ========== */
+  --pl-shadow-xs:   0 1px 0 rgba(60,45,25,0.04);
+  --pl-shadow-sm:   0 1px 2px rgba(60,45,25,0.06), 0 1px 1px rgba(60,45,25,0.04);
+  --pl-shadow-md:   0 2px 4px rgba(60,45,25,0.06), 0 4px 12px rgba(60,45,25,0.06);
+  --pl-shadow-lg:   0 4px 8px rgba(60,45,25,0.07), 0 12px 28px rgba(60,45,25,0.10);
+  --pl-shadow-xl:   0 8px 16px rgba(60,45,25,0.10), 0 24px 48px rgba(60,45,25,0.14);
+  --pl-shadow-lift: 0 12px 24px rgba(60,45,25,0.14), 0 32px 60px rgba(60,45,25,0.18);
+
+  /* === Focus ring ==================================================== */
+  --pl-focus:    0 0 0 3px rgba(107, 74, 135, 0.28);
+  --pl-focus-danger: 0 0 0 3px rgba(168, 65, 42, 0.28);
+
+  /* === Motion ======================================================== */
+  --pl-ease:     cubic-bezier(0.2, 0.7, 0.3, 1);
+  --pl-ease-out: cubic-bezier(0.16, 1, 0.3, 1);
+  --pl-dur-1: 120ms;
+  --pl-dur-2: 200ms;
+  --pl-dur-3: 320ms;
+  --pl-dur-4: 480ms;
+
+  /* === Z-index =======================================================*/
+  --pl-z-dropdown: 100;
+  --pl-z-sticky:   200;
+  --pl-z-overlay:  900;
+  --pl-z-modal:    1000;
+  --pl-z-toast:    1100;
+  --pl-z-tooltip:  1200;
+
+  /* === Type scale (for components — utility classes are still available) */
+  --pl-text-xs:   11px;
+  --pl-text-sm:   12px;
+  --pl-text-base: 13px;
+  --pl-text-md:   13.5px;
+  --pl-text-lg:   16px;
+  --pl-text-xl:   22px;
+
+  /* === Semantic form tokens ========================================== */
+  --pl-field-bg:           var(--pl-paper-card);
+  --pl-field-border:       var(--pl-hairline-strong);
+  --pl-field-border-hover: var(--pl-ink-4);
+  --pl-field-border-focus: var(--pl-accent-500);
+  --pl-field-text:         var(--pl-ink-1);
+  --pl-field-placeholder:  var(--pl-ink-4);
+  --pl-field-disabled-bg:  var(--pl-paper-1);
+}
+
+/* === Dark mode ======================================================= */
+.pl-dark, [data-theme="dark"] {
+  --pl-paper-0:    #14130F;
+  --pl-paper-1:    #1B1915;
+  --pl-paper-2:    #221F1A;
+  --pl-paper-3:    #2D2A23;
+  --pl-paper-card: #1F1D18;
+
+  --pl-hairline:        rgba(255, 250, 240, 0.07);
+  --pl-hairline-strong: rgba(255, 250, 240, 0.13);
+
+  --pl-ink-1: #F4EFE5;
+  --pl-ink-2: #D9D3C5;
+  --pl-ink-3: #9C9486;
+  --pl-ink-4: #6E675B;
+  --pl-ink-5: #4A453C;
+
+  --pl-accent-50:  #2A1F36;
+  --pl-accent-100: #3A2A4A;
+  --pl-accent-200: #553A6C;
+  --pl-accent-300: #7A569A;
+  --pl-accent-400: #A586C2;
+  --pl-accent-500: #C2A4DB;   /* lifts in dark for legibility */
+  --pl-accent-600: #D4BDE8;
+  --pl-accent-700: #E4D2F0;
+  --pl-accent-ink: #14130F;
+
+  --pl-ok-50:#1B2419; --pl-ok-200:#3A5234; --pl-ok-500:#93B58E; --pl-ok-700:#BFD3BC;
+  --pl-warn-50:#2A2113; --pl-warn-200:#5A4220; --pl-warn-500:#D9A95C; --pl-warn-700:#EDD3A2;
+  --pl-danger-50:#2A1815; --pl-danger-200:#5A2C22; --pl-danger-500:#D88A75; --pl-danger-700:#E6BBB0;
+  --pl-info-50:#15202A; --pl-info-200:#2C4458; --pl-info-500:#94B0C4;
+
+  --pl-cat-blue:#7A9CB5; --pl-cat-amber:#D9A95C; --pl-cat-green:#93B58E;
+  --pl-cat-rose:#D88A75; --pl-cat-plum:#C2A4DB; --pl-cat-clay:#C99878;
+  --pl-cat-moss:#9CAB7A; --pl-cat-teal:#7AABA6;
+
+  --pl-shadow-xs:   0 1px 0 rgba(0,0,0,0.3);
+  --pl-shadow-sm:   0 1px 2px rgba(0,0,0,0.4), 0 1px 1px rgba(0,0,0,0.3);
+  --pl-shadow-md:   0 2px 4px rgba(0,0,0,0.4), 0 4px 12px rgba(0,0,0,0.35);
+  --pl-shadow-lg:   0 4px 8px rgba(0,0,0,0.45), 0 12px 28px rgba(0,0,0,0.4);
+  --pl-shadow-xl:   0 8px 16px rgba(0,0,0,0.5), 0 24px 48px rgba(0,0,0,0.5);
+  --pl-shadow-lift: 0 12px 24px rgba(0,0,0,0.6), 0 32px 60px rgba(0,0,0,0.7);
+
+  --pl-field-bg:           var(--pl-paper-card);
+  --pl-field-border:       var(--pl-hairline-strong);
+  --pl-field-border-hover: var(--pl-ink-3);
+  --pl-field-border-focus: var(--pl-accent-500);
+  --pl-field-text:         var(--pl-ink-1);
+  --pl-field-placeholder:  var(--pl-ink-4);
+  --pl-field-disabled-bg:  var(--pl-paper-1);
+}
+
+/* === Base reset for the design system surface ======================== */
+.pl-root, .pl-root * { box-sizing: border-box; }
+.pl-root {
+  font-family: var(--pl-font-sans);
+  color: var(--pl-ink-1);
+  background: var(--pl-paper-0);
+  font-feature-settings: "ss01", "cv11";
+  -webkit-font-smoothing: antialiased;
+  text-rendering: optimizeLegibility;
+}
+.pl-root .pl-serif { font-family: var(--pl-font-serif); font-weight: 400; letter-spacing: -0.01em; }
+.pl-root .pl-mono  { font-family: var(--pl-font-mono);  font-feature-settings: "tnum"; }
+
+/* === Common utility classes ========================================= */
+.pl-eyebrow {
+  font-size: 10.5px; font-weight: 600;
+  letter-spacing: 0.14em; text-transform: uppercase;
+  color: var(--pl-ink-4);
+}
+.pl-display { font-family: var(--pl-font-serif); font-size: 56px; line-height: 1.05; letter-spacing: -0.025em; font-weight: 400; }
+.pl-h1      { font-family: var(--pl-font-serif); font-size: 36px; line-height: 1.1;  letter-spacing: -0.02em;  font-weight: 400; }
+.pl-h2      { font-family: var(--pl-font-sans);  font-size: 22px; line-height: 1.3;  letter-spacing: -0.01em;  font-weight: 600; }
+.pl-h3      { font-family: var(--pl-font-sans);  font-size: 16px; line-height: 1.35; letter-spacing: -0.005em; font-weight: 600; }
+.pl-body    { font-family: var(--pl-font-sans);  font-size: 13.5px; line-height: 1.6; }
+.pl-small   { font-family: var(--pl-font-sans);  font-size: 12px; line-height: 1.5; color: var(--pl-ink-3); }
+
+::selection { background: var(--pl-accent-200); color: var(--pl-accent-700); }
+
+/* === Focus ring (applied to component classes) ====================== */
+.pl-btn:focus-visible,
+.pl-field:focus-within,
+.pl-tab:focus-visible,
+.pl-iconbtn:focus-visible,
+.pl-menu-item:focus-visible,
+.pl-link:focus-visible,
+.pl-page-btn:focus-visible {
+  outline: none;
+  box-shadow: var(--pl-focus);
+}
+.pl-btn--danger:focus-visible {
+  box-shadow: var(--pl-focus-danger);
+}
+.pl-checkbox:focus-within .pl-checkbox-box,
+.pl-radio:focus-within .pl-radio-dot,
+.pl-toggle:focus-within .pl-toggle-track {
+  box-shadow: var(--pl-focus);
+}
+
+/* === Visually-hidden helper for accessible-but-invisible inputs ===== */
+.pl-sr-only {
+  position: absolute !important;
+  width: 1px; height: 1px;
+  padding: 0; margin: -1px;
+  overflow: hidden; clip: rect(0,0,0,0);
+  white-space: nowrap; border: 0;
+}
+
+/* === Skeleton shimmer animation ===================================== */
+@keyframes pl-skeleton {
+  0%   { background-position: -200% 0; }
+  100% { background-position: 200% 0; }
+}
+@keyframes pl-spin {
+  to { transform: rotate(360deg); }
+}
+
+/* === Reduced motion ================================================= */
+@media (prefers-reduced-motion: reduce) {
+  *, *::before, *::after {
+    animation-duration: 0.01ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.01ms !important;
+    scroll-behavior: auto !important;
+  }
+}
